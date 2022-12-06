@@ -37,12 +37,12 @@ struct ContentView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 30, height: 30)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color("ButtonText"))
                         
                         Text("Connect Spotify")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color("ButtonText"))
                     }
                     .padding()
                     .background(Color("Button"))

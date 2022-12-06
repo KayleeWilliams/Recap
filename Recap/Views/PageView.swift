@@ -16,7 +16,7 @@ struct PageView: View {
         
     var body: some View {
         TabView {
-            TopTracks()
+            TopView()
                 .tabItem {
                     Image(systemName: "house")
                         .padding(.bottom, 100)
@@ -33,6 +33,7 @@ struct PageView: View {
             
         }
         .accentColor(Color("Button"))
+        .onAppear{UITabBar.appearance().backgroundColor = UIColor(Color("TabBG"))}
     }
 }
 
