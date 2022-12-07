@@ -11,7 +11,7 @@ import SwiftUI
 struct RecapApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PageView()
         }
     }
 }

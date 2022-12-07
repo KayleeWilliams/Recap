@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  LoginView.swift
 //  Recap
 //
 //  Created by Kaylee Williams on 30/11/2022.
@@ -13,7 +13,7 @@ let responseType = "code"
 
 
 
-struct ContentView: View {
+struct LoginView: View {
     @State public var showLogin = false
 //    private let loginURL: String = "https://kayleewilliams.dev1"
     private let loginURL: String = "https://accounts.spotify.com/authorize?client_id=\(clientID)&response_type=\(responseType)&scopes=\(scopes)&redirect_uri=\(redirectURI)"
@@ -55,9 +55,9 @@ struct ContentView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        LoginView()
     }
 }
 

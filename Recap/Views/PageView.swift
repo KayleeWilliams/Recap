@@ -11,9 +11,10 @@ import SwiftUI
 struct PageView: View {
     init() {
         UITabBar.appearance().backgroundColor = UIColor(Color("TabBG"))
+        UITabBar.appearance().barTintColor = UIColor(Color("TabBG"))
         UITabBar.appearance().unselectedItemTintColor = .white
     }
-        
+    
     var body: some View {
         TabView {
             TopView()
@@ -30,14 +31,30 @@ struct PageView: View {
                     Text("Popularity")
                         .foregroundColor(.white)
                 }
+
+            ResultsView(resultStyle: "Artist")
+                .tabItem {
+                    Image(systemName: "person.fill.viewfinder")
+                    Text("Artist Finder")
+                        .foregroundColor(.white)
+                }
+            
+            SongFinderView()
+                .tabItem {
+                    Image(systemName: "waveform")
+                    Text("Song Finder")
+                        .foregroundColor(.white)
+                }
             
         }
         .accentColor(Color("Button"))
-        .onAppear{UITabBar.appearance().backgroundColor = UIColor(Color("TabBG"))}
+        .onAppear{
+            UITabBar.appearance().backgroundColor = UIColor(Color("TabBG"))
+            UITabBar.appearance().barTintColor = UIColor(Color("TabBG"))
+            UITabBar.appearance().unselectedItemTintColor = .white
+        }
     }
 }
-
-
 
 struct PageView_Previews: PreviewProvider {
     static var previews: some View {
