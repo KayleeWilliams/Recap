@@ -30,7 +30,7 @@ struct LoginView: View {
                     .frame(width: 400, height: 400)
                     .padding(.bottom, 90)
                 
-
+                
                 Button(action: {showLogin.toggle()}, label: {
                     HStack {
                         Image("Spotify")
@@ -48,7 +48,7 @@ struct LoginView: View {
                     .background(Color("Button"))
                     .cornerRadius(10)
                 }).sheet(isPresented: $showLogin) {
-                    WebView(url: URL(string: loginURL))
+                    WebView(url: URL(string: loginURL)!, navigationController: UINavigationController())
                 }
             }
         }

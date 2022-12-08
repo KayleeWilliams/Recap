@@ -8,10 +8,10 @@
 import Foundation
 import SwiftUI
 
-struct Genre: Identifiable {
-    let name: String
-    let id = UUID()
-}
+//struct Genre: Identifiable {
+//    let name: String
+//    let id = UUID()
+//}
 
 struct SongFinderView: View {
     @State private var multiSelection = Set<UUID>()
@@ -31,7 +31,7 @@ struct SongFinderView: View {
                 
                 List (selection: $multiSelection) {
                     ForEach(genreList) { genre in
-                        Text(genre.name)
+                        Text(genre.label)
                             .badge(multiSelection.contains(genre.id) ? selectedBadge : nil )
                             .foregroundColor(Color("PrimaryText"))
                             .font(.system(size: 17, weight: .medium))
@@ -75,23 +75,16 @@ struct SongFinderView_Previews: PreviewProvider {
 
 
 var genreList = [
-    Genre(name: "Pop"),
-    Genre(name: "Rock"),
-    Genre(name: "Test"),
-    Genre(name: "Pop"),
-    Genre(name: "Rock"),
-    Genre(name: "Test"),
-    Genre(name: "Pop"),
-    Genre(name: "Test"),
-    Genre(name: "Pop"),
-    Genre(name: "Rock"),
-    Genre(name: "Test"),
-    Genre(name: "Pop"),
-    Genre(name: "Test"),
-    Genre(name: "Pop"),
-    Genre(name: "Rock"),
-    Genre(name: "Test"),
-    Genre(name: "Pop"),
+    GenreData(label: "Rock", value: 100),
+    GenreData(label: "Pop", value: 90),
+    GenreData(label: "Hip Hop", value: 80),
+    GenreData(label: "R&B", value: 70),
+    GenreData(label: "Country", value: 60),
+    GenreData(label: "Jazz", value: 50),
+    GenreData(label: "Classical", value: 10),
+    GenreData(label: "Metal", value: 40),
+    GenreData(label: "Folk", value: 20),
+    GenreData(label: "Electronic", value: 30),
 
 ]
 

@@ -77,25 +77,17 @@ struct ResultView: View {
     var resultStyle: String
     var body: some View {
         HStack() {
-            if resultStyle == "Artist" {
-                Image("Placeholder")
-                    .resizable()
-                    .frame(width: 48, height: 48)
-                    .cornerRadius(100)
-                    .padding(.leading, 12)
-            }
-            else {
-                Image("Placeholder")
-                    .resizable()
-                    .frame(width: 48, height: 48)
-                    .cornerRadius(12)
-                    .padding(.leading, 12)
-            }
+            Image("Placeholder")
+                .resizable()
+                .frame(width: 48, height: 48)
+                .cornerRadius(resultStyle == "Artist" ? 100 : 12)
+                .padding(.leading, 12)
             
             VStack(alignment: .leading) {
                 Text("Title")
                     .foregroundColor(Color("PrimaryText"))
                     .font(.system(size: 20, weight: .bold))
+                
                 Text("Alt Text")
                     .foregroundColor(Color("AltText"))
                     .font(.system(size: 20, weight: .medium))

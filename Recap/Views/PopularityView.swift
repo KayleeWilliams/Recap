@@ -28,8 +28,7 @@ struct PopularityView: View {
                         }
                     }
                 }
-                
-            }
+            }.padding(.bottom, 18)
         }
     }
 }

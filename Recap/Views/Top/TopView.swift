@@ -12,28 +12,32 @@ import Charts
 struct TopView: View {
     // Style Segment Control bar
     init() {
-        let backgroundColor = UIColor(Color("Background"))
-        let buttonColor = UIColor(Color("Button"))
-        let primaryTextColor = UIColor(Color("PrimaryText"))
-
         let selectedAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: buttonColor,
+            .foregroundColor: UIColor(Color("Button")),
             .font: UIFont.systemFont(ofSize: 17, weight: .bold)
         ]
         
         let normalAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: primaryTextColor,
+            .foregroundColor: UIColor(Color("PrimaryText")),
             .font: UIFont.systemFont(ofSize: 17, weight: .bold)
         ]
         
-        UISegmentedControl.appearance().backgroundColor = backgroundColor
-        UISegmentedControl.appearance().selectedSegmentTintColor = .clear
         UISegmentedControl.appearance().setTitleTextAttributes(selectedAttributes, for: .selected)
+        
         UISegmentedControl.appearance().setTitleTextAttributes(normalAttributes, for: .normal)
+                
+        UISegmentedControl.appearance().selectedSegmentTintColor = .clear
+        
+        UISegmentedControl.appearance().backgroundColor = UIColor(Color("AltBG"))
+
     }
     
     @State private var selectedTop = "Tracks"
+    @State private var selectedTime = "1 Month"
+
     var sections = ["Tracks", "Artists", "Albums", "Genres"]
+    var times = ["1 Month", "6 Months", "Lifetime"]
+    
     
     var body: some View {
         ZStack {
@@ -46,11 +50,11 @@ struct TopView: View {
                     .padding(.bottom, 8)
                     .foregroundColor(Color("PrimaryText"))
                 
-                // Segmented Picker
+                // Section Picker
                 Picker(selection: $selectedTop, label: Text("Top")) {
                     ForEach(sections, id: \.self) {
                         Text($0)
-                        .font(.system(size: 17, weight: .bold))
+                            .font(.system(size: 17, weight: .bold))
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
@@ -81,12 +85,22 @@ struct TopView: View {
                         
                     }
                     .padding(.horizontal, 20)
-
+                    
                     if selectedTop == "Genres" {
                         GenresView()
                     }
                 }
                 
+                // Time Picker
+                Picker(selection: $selectedTime, label: Text("Top")) {
+                    ForEach(times, id: \.self) {
+                        Text($0)
+                            .font(.system(size: 17, weight: .bold))
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding([.horizontal], 20)
+                .padding([.bottom, .top], 8)
             }
         }
     }
@@ -177,14 +191,9 @@ struct GenresView: View {
     }
 }
 
-struct GenreData: Hashable {
-     var label: String
-     var value: Int
- }
-
 // Twmp dummy data
 struct BarChart: View {
-    let genres = [
+    let genreList = [
         GenreData(label: "Rock", value: 100),
         GenreData(label: "Pop", value: 90),
         GenreData(label: "Hip Hop", value: 80),
@@ -198,14 +207,14 @@ struct BarChart: View {
     ]
     var body: some View {
         Chart {
-            ForEach(genres, id: \.self) { i in
+            ForEach(genreList) { genre in
                 BarMark(
-                    x: .value("Value", i.value),
-                    y: .value("Genre", i.label)
+                    x: .value("Value", genre.value),
+                    y: .value("Genre", genre.label)
                 )
                 .foregroundStyle(Color("Button"))
                 .annotation (position: .overlay, alignment: .leading, spacing: 10) {
-                    Text("\(i.label)")
+                    Text("\(genre.label)")
                         .foregroundColor(Color("ButtonText"))
                         .fontWeight (.bold)
                 }
