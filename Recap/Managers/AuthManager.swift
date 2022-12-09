@@ -6,15 +6,17 @@
 //
 
 import Foundation
+import KeychainAccess
 
-class AuthManager {
-    static let shared = AuthManager()
-    
+class AuthManager: ObservableObject {
+    @Published var isValidated = false
+    @Published var loginVisible = false
+
     let clientID: String
     let clientSecret: String
     let redirectUri: String
     
-    private init() {
+    init() {
         clientID = "09b5f29ff349407d8f16aad612e032cd"
         clientSecret = "27245688409c49d3951500661f5d6caa"
         redirectUri = "https://www.kayleewilliams.dev"
@@ -46,8 +48,10 @@ class AuthManager {
             if let data = data {
                 do {
                     let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                    UserDefaults.standard.set(json["access_token"] as! String, forKey: "accessToken")
-                    
+//                    UserDefaults.standard.set(json["access_token"] as! String, forKey: "accessToken")
+                    let keychain = Keychain()
+                    try keychain.set(json["access_token"] as! String, key: "accessToken")
+                    self.isValidated = true
                 } catch {
                     print("Error: \(error)")
                 }

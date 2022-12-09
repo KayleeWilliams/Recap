@@ -6,12 +6,33 @@
 //
 
 import SwiftUI
+import KeychainAccess
 
 @main
 struct RecapApp: App {
+    @StateObject var authentication = AuthManager()
+    @State private var splashVisible = true
+    
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            if splashVisible {
+                SplashView()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            splashVisible = false
+                        }
+                    }
+            } else {
+                
+                if authentication.isValidated == false {
+                    LoginView()
+                        .environmentObject(authentication)
+                }
+                else {
+                    PageView()
+                        .environmentObject(authentication)
+                }
+            }
         }
     }
 }
