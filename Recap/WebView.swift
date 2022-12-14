@@ -60,7 +60,7 @@ struct WebView: UIViewRepresentable {
             
             // If redirected... 
             if let navURL = navigationAction.request.url {
-                if navURL.host! == "www.kayleewilliams.dev" {
+                if navURL.host == "www.kayleewilliams.dev" {
                     var code = URLComponents(string: navURL.absoluteString)?.queryItems?.first(where: { $0.name == "code" })?.value
                     if code != nil {
                         self.auth.exchangeCode(code: code!)
