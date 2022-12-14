@@ -9,15 +9,20 @@ import Foundation
 import SwiftUI
 
 struct PageView: View {
+    @EnvironmentObject var authentication: AuthManager
+    @EnvironmentObject var apiManager: APIManager
+
+
     init() {
         UITabBar.appearance().backgroundColor = UIColor(Color("TabBG"))
         UITabBar.appearance().barTintColor = UIColor(Color("TabBG"))
         UITabBar.appearance().unselectedItemTintColor = .white
-    }
+        }
     
     var body: some View {
         TabView {
             TopView()
+                .environmentObject(apiManager)
                 .tabItem {
                     Image(systemName: "house")
                         .padding(.bottom, 100)
@@ -52,6 +57,8 @@ struct PageView: View {
             UITabBar.appearance().backgroundColor = UIColor(Color("TabBG"))
             UITabBar.appearance().barTintColor = UIColor(Color("TabBG"))
             UITabBar.appearance().unselectedItemTintColor = .white
+            
+            self.apiManager.getData()
         }
     }
 }

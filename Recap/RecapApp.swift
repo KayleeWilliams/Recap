@@ -11,8 +11,8 @@ import KeychainAccess
 @main
 struct RecapApp: App {
     @StateObject var authentication = AuthManager()
+    @StateObject var apiManager = APIManager()
     @State private var splashVisible = true
-    
     var body: some Scene {
         WindowGroup {
             if splashVisible {
@@ -31,6 +31,7 @@ struct RecapApp: App {
                 else {
                     PageView()
                         .environmentObject(authentication)
+                        .environmentObject(apiManager)
                 }
             }
         }

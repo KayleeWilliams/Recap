@@ -7,7 +7,6 @@
 
 import Foundation
 import KeychainAccess
-//import CryptoKit
 import CommonCrypto
 
 class AuthManager: ObservableObject {
@@ -88,45 +87,4 @@ class AuthManager: ObservableObject {
         }
         task.resume()
     }
-
-    
-    
-    
-    //    func exchangeCode(code: String) {
-    //        let grantType = "authorization_code"
-    //        let base64Encoded = Data("\(self.clientID):\(self.clientSecret)".utf8).base64EncodedString()
-    //        let tokenRequestString = "https://accounts.spotify.com/api/token"
-    //
-    //        let url = URL(string: tokenRequestString)!
-    //        var request = URLRequest(url: url)
-    //
-    //        // Set headers & method
-    //        request.httpMethod = "POST"
-    //        request.setValue("Basic \(base64Encoded)", forHTTPHeaderField: "Authorization")
-    //        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-    //
-    //        // Set form content
-    //        let body = "grant_type=\(grantType)&code=\(code)&redirect_uri=\(self.redirectUri)".data(using: .utf8)
-    //        request.httpBody = body
-    //
-    //        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-    //            if let error = error {
-    //                print("Error: \(error)")
-    //                return
-    //            }
-    //
-    //            if let data = data {
-    //                do {
-    //                    let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-    //                    let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
-    //                    try keychain.set(json["access_token"] as! String, key: "accessToken")
-    //                    self.isValidated = true
-    //                } catch {
-    //                    print("Error: \(error)")
-    //                }
-    //            }
-    //        }
-    //        task.resume()
-    //    }
-    //}
 }
