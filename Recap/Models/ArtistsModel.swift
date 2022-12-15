@@ -13,7 +13,7 @@ struct ArtistsModel: Codable {
     let href: String?
 }
 
-struct Artist: Identifiable, Codable {
+struct Artist: Identifiable, Codable, Hashable, Equatable {
     let externalUrls: ExternalUrls?
     let followers: Followers?
     let genres: [String]?
@@ -23,10 +23,18 @@ struct Artist: Identifiable, Codable {
     let name: String?
     let popularity: Int?
     let type, uri: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case externalUrls = "external_urls"
         case followers, genres, href, id, images, name, popularity, type, uri
+    }
+    
+    static func == (lhs: Artist, rhs: Artist) -> Bool {
+        return lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 

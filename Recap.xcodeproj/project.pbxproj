@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		CC3CC51E2949B58D00D2F0D8 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3CC51D2949B58D00D2F0D8 /* APIManager.swift */; };
-		CC3CC523294A253000D2F0D8 /* ArtistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3CC522294A253000D2F0D8 /* ArtistModel.swift */; };
+		CC3CC523294A253000D2F0D8 /* ArtistsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3CC522294A253000D2F0D8 /* ArtistsModel.swift */; };
 		CC3CC525294A3DAA00D2F0D8 /* TracksModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3CC524294A3DAA00D2F0D8 /* TracksModel.swift */; };
 		CC408A032937FE9400CBDBD7 /* RecapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC408A022937FE9400CBDBD7 /* RecapApp.swift */; };
 		CC408A052937FE9400CBDBD7 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC408A042937FE9400CBDBD7 /* LoginView.swift */; };
@@ -31,7 +31,7 @@
 /* Begin PBXFileReference section */
 		CC3CC51D2949B58D00D2F0D8 /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 		CC3CC5202949DC2500D2F0D8 /* CryptoKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoKit.framework; path = System/Library/Frameworks/CryptoKit.framework; sourceTree = SDKROOT; };
-		CC3CC522294A253000D2F0D8 /* ArtistModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistModel.swift; sourceTree = "<group>"; };
+		CC3CC522294A253000D2F0D8 /* ArtistsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsModel.swift; sourceTree = "<group>"; };
 		CC3CC524294A3DAA00D2F0D8 /* TracksModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksModel.swift; sourceTree = "<group>"; };
 		CC4089FF2937FE9400CBDBD7 /* Recap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC408A022937FE9400CBDBD7 /* RecapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecapApp.swift; sourceTree = "<group>"; };
@@ -115,7 +115,7 @@
 			children = (
 				CCDC1B7B2942103200A33B6B /* GenreModel.swift */,
 				CCDC1B7D294210DF00A33B6B /* TopModel.swift */,
-				CC3CC522294A253000D2F0D8 /* ArtistModel.swift */,
+				CC3CC522294A253000D2F0D8 /* ArtistsModel.swift */,
 				CC3CC524294A3DAA00D2F0D8 /* TracksModel.swift */,
 			);
 			path = Models;
@@ -237,7 +237,7 @@
 				CC3CC525294A3DAA00D2F0D8 /* TracksModel.swift in Sources */,
 				CCEDD9B3293D510A00129DD1 /* PopularityView.swift in Sources */,
 				CC3CC51E2949B58D00D2F0D8 /* APIManager.swift in Sources */,
-				CC3CC523294A253000D2F0D8 /* ArtistModel.swift in Sources */,
+				CC3CC523294A253000D2F0D8 /* ArtistsModel.swift in Sources */,
 				CCCEB273293FF53500458BD9 /* SavedStyles.swift in Sources */,
 				CC408A052937FE9400CBDBD7 /* LoginView.swift in Sources */,
 				CCDC1B8929433D8100A33B6B /* SplashView.swift in Sources */,

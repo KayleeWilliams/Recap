@@ -31,6 +31,7 @@ struct PageView: View {
                         .foregroundColor(.white)
                 }
             PopularityView()
+                .environmentObject(apiManager)
                 .tabItem {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                     Text("Popularity")

@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 struct PopularityView: View {
+    @EnvironmentObject var apiManager: APIManager
     
     var body: some View {
         ZStack {
@@ -23,16 +24,16 @@ struct PopularityView: View {
                 
                 ScrollView {
                     VStack {
-                        ForEach(0..<15) { _ in
-                            ArtistPopularity()
+                        let test = apiManager.topArtistsMedium?.items?.sorted(by: { $0.popularity! > $1.popularity! })
+                        ForEach(test!, id: \.self) { artist in
+                            ArtistPopularity(artist: artist)
                         }
                     }
-                }
-            }.padding(.bottom, 18)
+                }.padding(.bottom, 18)
+            }
         }
     }
 }
-
 struct PopularityView_Previews: PreviewProvider {
     static var previews: some View {
         PopularityView()
@@ -40,22 +41,31 @@ struct PopularityView_Previews: PreviewProvider {
     }
 }
 
-
-
 struct ArtistPopularity: View {
+    let artist: Artist
     var body: some View {
         HStack(spacing: 18) {
-            Image("Placeholder")
-                .resizable()
-                .cornerRadius(100)
-                .frame(width: 48, height: 48)
-                .padding(.leading, 12)
+            AsyncImage(url: URL(string: (artist.images![0].url)!), content: { returnedImage in
+                if let returnedImage = returnedImage.image {
+                    returnedImage
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .cornerRadius(100)
+                        .padding(.leading, 12)
+                } else {
+                    Image("Placeholder")
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .cornerRadius(100)
+                        .padding(.leading, 12)
+                }
+            })
             VStack(alignment: .leading) {
-                Text("Artist Name")
+                Text("\(artist.name!)")
                     .foregroundColor(Color("AltText"))
                     .font(.system(size: 20, weight: .medium))
                 
-                Text("90")
+                Text("\(artist.popularity!)")
                     .foregroundColor(Color("PrimaryText"))
                     .font(.system(size: 20, weight: .bold))
             }
