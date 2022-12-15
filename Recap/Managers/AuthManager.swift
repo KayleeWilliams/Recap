@@ -19,14 +19,11 @@ class AuthManager: ObservableObject {
     let tokenURL = URL(string: "https://accounts.spotify.com/api/token")!
     var scope = "user-top-read playlist-modify-private"
     let authorizationURL: URL
-    let clientSecret = "27245688409c49d3951500661f5d6caa"
-    
     
     // Generate a random string to use as the state parameter and the code verifier for PKCE
     var buffer = [UInt8](repeating: 0, count: 32)
     var verifier: String
     
-
     init() {
         _ = SecRandomCopyBytes(kSecRandomDefault, buffer.count, &buffer)
         verifier = Data(buffer).base64EncodedString()
@@ -79,7 +76,7 @@ class AuthManager: ObservableObject {
                     let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
                     let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
                     try keychain.set(json["access_token"] as! String, key: "accessToken")
-                    self.isValidated = true
+                    DispatchQueue.main.async { self.isValidated = true }
                 } catch {
                     print("Error: \(error)")
                 }

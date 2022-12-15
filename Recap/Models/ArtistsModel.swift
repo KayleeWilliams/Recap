@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ArtistModel: Codable {
+struct ArtistsModel: Codable {
     let items: [Artist]?
     let total, limit, offset: Int?
     let href: String?

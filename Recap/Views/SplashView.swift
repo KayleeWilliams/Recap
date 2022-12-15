@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 struct SplashView: View {
-    @State private var size = 0.4
-    @State private var opacity = 0.5
+    @State private var size = 0.6
+    @State private var opacity = 0.7
 
     
     var body: some View {
@@ -19,7 +19,7 @@ struct SplashView: View {
                 .ignoresSafeArea()
             
             VStack {
-                Image("Cover")
+                Image("Logo")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 400, height: 400)

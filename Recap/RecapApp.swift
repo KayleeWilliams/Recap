@@ -19,7 +19,7 @@ struct RecapApp: App {
                 SplashView()
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            splashVisible = false
+                            DispatchQueue.main.async { splashVisible = false }
                         }
                     }
             } else {
