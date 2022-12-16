@@ -21,6 +21,11 @@ class APIManager: ObservableObject {
     @Published var topAlbumsMedium: Array<(key: String, value: (Album, Int))>?
     @Published var topAlbumsLong: Array<(key: String, value: (Album, Int))>?
     
+    @Published var topGenresShort: Array<(key: String, value: Int)>?
+    @Published var topGenresMedium: Array<(key: String, value: Int)>?
+    @Published var topGenresLong: Array<(key: String, value: Int)>?
+
+    
     let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
     
     func getToken() -> String? {
@@ -51,19 +56,42 @@ class APIManager: ObservableObject {
         }
         
         self.getTopArtists(timeRange: "short_term") { (result) in
-            DispatchQueue.main.async { self.topArtistsShort = result }
+            DispatchQueue.main.async {
+                self.topArtistsShort = result
+                self.topGenresShort = self.getGenres(artists: result!)
+            }
         }
         self.getTopArtists(timeRange: "medium_term") { (result) in
-            DispatchQueue.main.async { self.topArtistsMedium = result }
+            DispatchQueue.main.async {
+                self.topArtistsMedium = result
+                self.topGenresMedium = self.getGenres(artists: result!)
+            }
         }
         self.getTopArtists(timeRange: "long_term") { (result) in
-            DispatchQueue.main.async { self.topArtistsLong = result }
+            DispatchQueue.main.async {
+                self.topArtistsLong = result
+                self.topGenresLong = self.getGenres(artists: result!)
+            }
         }
-        
-        
     }
     
-    func getAlbums(tracks: TracksModel) -> Array<(key: String, value: (Album, Int))>? {
+    
+    func getGenres(artists: ArtistsModel) -> Array<(key: String, value: Int)> {
+        var genreCounts: [String: Int] = [:]
+        for artist in artists.items! {
+            for genre in artist.genres! {
+                if genreCounts[genre] == nil {
+                    genreCounts[genre] = 1
+                } else {
+                    genreCounts[genre]! += 1
+                }
+            }
+        }
+        
+        return genreCounts.sorted{ $0.value > $1.value }
+    }
+    
+    func getAlbums(tracks: TracksModel) -> Array<(key: String, value: (Album, Int))> {
         let albumCountsById = tracks.items!.reduce(into: [String: (Album, Int)]()) { albums, item in
             if let album = item.album {
                 if album.albumType == "ALBUM" {

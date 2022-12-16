@@ -55,6 +55,9 @@ struct TopView: View {
         case ("Albums", .short): return apiManager.topAlbumsShort?.map { $0.value.0 } ?? []
         case ("Albums", .medium): return apiManager.topAlbumsMedium?.map { $0.value.0 } ?? []
         case ("Albums", .long): return apiManager.topAlbumsLong?.map { $0.value.0 } ?? []
+        case ("Genres", .short): return apiManager.topGenresShort!
+        case ("Genres", .medium): return apiManager.topGenresMedium!
+        case ("Genres", .long): return apiManager.topGenresLong!
         default: return []
         }
     }
@@ -84,23 +87,23 @@ struct TopView: View {
                 
                 // Content
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                        ForEach(0..<getItems().count, id: \.self) { index in
-                            VStack {
-                                if selectedTop == "Artists" {
-                                    ArtistView(artist: getItems()[index] as! Artist, id: "\(index+1)")
-                                } else if selectedTop == "Tracks" {
-                                    TrackView(track: getItems()[index] as! Track, id: "\(index+1)")
-                                } else if selectedTop == "Albums" {
-                                    AlbumView(album: getItems()[index] as! Album, id: "\(index+1)")
+                    if ["Artists", "Tracks", "Albums"].contains(selectedTop){
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                            ForEach(0..<getItems().count, id: \.self) { index in
+                                VStack {
+                                    if selectedTop == "Artists" {
+                                        ArtistView(artist: getItems()[index] as! Artist, id: "\(index+1)")
+                                    } else if selectedTop == "Tracks" {
+                                        TrackView(track: getItems()[index] as! Track, id: "\(index+1)")
+                                    } else if selectedTop == "Albums" {
+                                        AlbumView(album: getItems()[index] as! Album, id: "\(index+1)")
+                                    }
                                 }
                             }
-                        }
-                    }.padding(.horizontal, 20)
-                    
-                    if selectedTop == "Genres" {
-                        GenresView()
+                        }.padding(.horizontal, 20)
                     }
+                    else {
+                        GenresView(topGenres: getItems() as! Array<(key: String, value: Int)>?)}
                 }
                 
                 Picker(selection: $selectedTime, label: Text("Top")) {
@@ -185,9 +188,6 @@ struct ArtistView: View {
                     .foregroundColor(Color("PrimaryText"))
                     .font(.system(size: 14, weight: .bold))
             }
-//            Text("Artist")
-//                .foregroundColor(Color("AltText"))
-//                .font(.system(size: 14, weight: .medium))
         }
     }
 }
@@ -227,13 +227,14 @@ struct AlbumView: View {
 }
 
 struct GenresView: View {
+    let topGenres: Array<(key: String, value: Int)>?
 
     var body: some View {
         VStack {
             GroupBox() {
-                BarChart()
+                BarChart(topGenres: topGenres)
             }
-            .frame(height: 500)
+//            .frame(minHeight: 500)
             .padding([.leading, .trailing], 12)
             .groupBoxStyle(TopGroupBoxStyle())
 
@@ -241,50 +242,26 @@ struct GenresView: View {
     }
 }
 
-// Twmp dummy data
 struct BarChart: View {
-    let genreList = [
-        GenreData(label: "Rock", value: 100),
-        GenreData(label: "Pop", value: 90),
-        GenreData(label: "Hip Hop", value: 80),
-        GenreData(label: "R&B", value: 70),
-        GenreData(label: "Country", value: 60),
-        GenreData(label: "Jazz", value: 50),
-        GenreData(label: "Classical", value: 10),
-        GenreData(label: "Metal", value: 40),
-        GenreData(label: "Folk", value: 20),
-        GenreData(label: "Electronic", value: 30),
-    ]
+    let topGenres: Array<(key: String, value: Int)>?
+    
     var body: some View {
         Chart {
-            ForEach(genreList) { genre in
+            ForEach(topGenres!, id: \.key) { genre in
                 BarMark(
                     x: .value("Value", genre.value),
-                    y: .value("Genre", genre.label)
+                    y: .value("Genre", genre.key)
                 )
                 .foregroundStyle(Color("Button"))
-                .annotation (position: .overlay, alignment: .leading, spacing: 10) {
-                    Text("\(genre.label)")
-                        .foregroundColor(Color("ButtonText"))
+                .annotation (position: .trailing, alignment: .center, spacing: 10) {
+                    Text("\(genre.key)")
+                        .foregroundColor(Color("PrimaryText"))
                         .fontWeight (.bold)
                 }
             }
         }
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
-
+        .frame(height: CGFloat(topGenres!.count * 40))
     }
 }
-
-//struct TrackGrid: View {
-//    let tracks: [Track]
-//    var body: some View {
-//        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-//            if let indices = tracks.indices {
-//                ForEach(indices, id: \.self) { index in
-//                    TrackView(track: (tracks[index], id: "\(index+1)")
-//                }
-//            }
-//        }.padding(.horizontal, 20)
-//    }
-//}
