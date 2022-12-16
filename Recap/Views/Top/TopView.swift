@@ -43,6 +43,21 @@ struct TopView: View {
     @State private var selectedTime: Times = .short
 
     var sections = ["Tracks", "Artists", "Albums", "Genres"]
+
+    private func getItems() -> [Any] {
+        switch (selectedTop, selectedTime) {
+        case ("Artists", .short): return apiManager.topArtistsShort?.items ?? []
+        case ("Artists", .medium): return apiManager.topArtistsMedium?.items ?? []
+        case ("Artists", .long): return apiManager.topArtistsLong?.items ?? []
+        case ("Tracks", .short): return apiManager.topTracksShort?.items ?? []
+        case ("Tracks", .medium): return apiManager.topTracksMedium?.items ?? []
+        case ("Tracks", .long): return apiManager.topTracksLong?.items ?? []
+        case ("Albums", .short): return apiManager.topAlbumsShort?.map { $0.value.0 } ?? []
+        case ("Albums", .medium): return apiManager.topAlbumsMedium?.map { $0.value.0 } ?? []
+        case ("Albums", .long): return apiManager.topAlbumsLong?.map { $0.value.0 } ?? []
+        default: return []
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -69,72 +84,20 @@ struct TopView: View {
                 
                 // Content
                 ScrollView {
-                    if (selectedTop == "Artists" && ((apiManager.topArtistsShort?.items) != nil)) {
-                        if selectedTime == .short {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                if let indices = apiManager.topArtistsShort?.items?.indices {
-                                    ForEach(indices, id: \.self) { index in
-                                        ArtistView(artist: (apiManager.topArtistsShort?.items![index])!, id: "\(index+1)")
-                                    }
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                        ForEach(0..<getItems().count, id: \.self) { index in
+                            VStack {
+                                if selectedTop == "Artists" {
+                                    ArtistView(artist: getItems()[index] as! Artist, id: "\(index+1)")
+                                } else if selectedTop == "Tracks" {
+                                    TrackView(track: getItems()[index] as! Track, id: "\(index+1)")
+                                } else if selectedTop == "Albums" {
+                                    AlbumView(album: getItems()[index] as! Album, id: "\(index+1)")
                                 }
-                            }.padding(.horizontal, 20)
+                            }
                         }
-                        else if selectedTime == .medium {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                if let indices = apiManager.topArtistsMedium?.items?.indices {
-                                    ForEach(indices, id: \.self) { index in
-                                        ArtistView(artist: (apiManager.topArtistsMedium?.items![index])!, id: "\(index+1)")
-                                    }
-                                }
-                            }.padding(.horizontal, 20)
-                        }
-                        else {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                if let indices = apiManager.topArtistsLong?.items?.indices {
-                                    ForEach(indices, id: \.self) { index in
-                                        ArtistView(artist: (apiManager.topArtistsLong?.items![index])!, id: "\(index+1)")
-                                    }
-                                }
-                            }.padding(.horizontal, 20)
-                        }
-                    }
-                        
-                    else if (selectedTop == "Tracks" && ((apiManager.topTracksShort?.items) != nil)) {
-                        if selectedTime == .short {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                if let indices = apiManager.topTracksShort?.items?.indices {
-                                    ForEach(indices, id: \.self) { index in
-                                        TrackView(track: (apiManager.topTracksShort?.items![index])!, id: "\(index+1)")
-                                    }
-                                }
-                            }.padding(.horizontal, 20)
-                        }
-                        else if selectedTime == .medium {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                if let indices = apiManager.topTracksMedium?.items?.indices {
-                                    ForEach(indices, id: \.self) { index in
-                                        TrackView(track: (apiManager.topTracksMedium?.items![index])!, id: "\(index+1)")
-                                    }
-                                }
-                            }.padding(.horizontal, 20)
-                        }
-                        else {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                if let indices = apiManager.topTracksLong?.items?.indices {
-                                    ForEach(indices, id: \.self) { index in
-                                        TrackView(track: (apiManager.topTracksLong?.items![index])!, id: "\(index+1)")
-                                    }
-                                }
-                            }.padding(.horizontal, 20)
-                        }
-                    }
-                
-                    if selectedTop == "Albums" {
-                        ForEach(0..<10) { _ in
-                            AlbumsView()
-                        }
-                    }
-                            
+                    }.padding(.horizontal, 20)
+                    
                     if selectedTop == "Genres" {
                         GenresView()
                     }
@@ -198,6 +161,7 @@ struct TrackView: View {
 struct ArtistView: View {
     var artist: Artist
     var id: String
+    
     var body: some View {
         VStack(alignment: .leading) {
             AsyncImage(url: URL(string: (artist.images![0].url)!), content: { returnedImage in
@@ -217,7 +181,7 @@ struct ArtistView: View {
                 Text("\(id).")
                     .foregroundColor(Color("AltText"))
                     .font(.system(size: 14, weight: .medium))
-                Text("\(artist.name!)")
+                Text("\(artist.name!)".prefix(20))
                     .foregroundColor(Color("PrimaryText"))
                     .font(.system(size: 14, weight: .bold))
             }
@@ -228,22 +192,34 @@ struct ArtistView: View {
     }
 }
 
-struct AlbumsView: View {
+struct AlbumView: View {
+    var album: Album
+    var id: String
+    
     var body: some View {
         VStack(alignment: .leading) {
-            Image("Placeholder")
-                .resizable()
-                .frame(width: 160, height: 160)
-                .cornerRadius(12)
+            AsyncImage(url: URL(string: (album.images![0].url)!), content: { returnedImage in
+                if let returnedImage = returnedImage.image {
+                    returnedImage
+                        .resizable()
+                        .frame(width: 160, height: 160)
+                        .cornerRadius(8)
+                } else {
+                    Image("Placeholder")
+                        .resizable()
+                        .frame(width: 160, height: 160)
+                        .cornerRadius(8)
+                }
+            })
             HStack(spacing: 4) {
-                Text("1.")
+                Text("\(id).")
                     .foregroundColor(Color("AltText"))
                     .font(.system(size: 14, weight: .medium))
-                Text("Album Name")
+                Text(album.name!.prefix(20))
                     .foregroundColor(Color("PrimaryText"))
                     .font(.system(size: 14, weight: .bold))
             }
-            Text("Artist")
+            Text(album.artists![0].name!)
                 .foregroundColor(Color("AltText"))
                 .font(.system(size: 14, weight: .medium))
         }

@@ -17,9 +17,9 @@ class APIManager: ObservableObject {
     @Published var topArtistsMedium: ArtistsModel?
     @Published var topArtistsLong: ArtistsModel?
     
-    @Published var topAlbumsShort: [Album]?
-    @Published var topAlbumsMedium: [Album]?
-    @Published var topAlbumsLong: [Album]?
+    @Published var topAlbumsShort: Array<(key: String, value: (Album, Int))>?
+    @Published var topAlbumsMedium: Array<(key: String, value: (Album, Int))>?
+    @Published var topAlbumsLong: Array<(key: String, value: (Album, Int))>?
     
     let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
     
@@ -32,13 +32,22 @@ class APIManager: ObservableObject {
     func getData() {
         // Async as Publishing changes from background threads is not allowed; make sure to publish values from the main thread.
         self.getTopTracks(timeRange: "short_term") { (result) in
-            DispatchQueue.main.async { self.topTracksShort = result }
+            DispatchQueue.main.async {
+                self.topTracksShort = result
+                self.topAlbumsShort = self.getAlbums(tracks: result!)
+            }
         }
         self.getTopTracks(timeRange: "medium_term") { (result) in
-            DispatchQueue.main.async { self.topTracksMedium = result }
+            DispatchQueue.main.async {
+                self.topTracksMedium = result
+                self.topAlbumsMedium = self.getAlbums(tracks: result!)
+            }
         }
         self.getTopTracks(timeRange: "long_term") { (result) in
-            DispatchQueue.main.async { self.topTracksLong = result }
+            DispatchQueue.main.async {
+                self.topTracksLong = result
+                self.topAlbumsLong = self.getAlbums(tracks: result!)
+            }
         }
         
         self.getTopArtists(timeRange: "short_term") { (result) in
@@ -52,6 +61,22 @@ class APIManager: ObservableObject {
         }
         
         
+    }
+    
+    func getAlbums(tracks: TracksModel) -> Array<(key: String, value: (Album, Int))>? {
+        let albumCountsById = tracks.items!.reduce(into: [String: (Album, Int)]()) { albums, item in
+            if let album = item.album {
+                if album.albumType == "ALBUM" {
+                    if let entry = albums[album.id!] {
+                        albums[album.id!] = (entry.0, entry.1 + 1)
+                    } else {
+                        albums[album.id!] = (album, 1)
+                    }
+                }
+            }
+        }
+        let sortedAlbumIDCounts = albumCountsById.sorted { $0.value.1 > $1.value.1 }
+        return sortedAlbumIDCounts
     }
     
     func getTopTracks(timeRange: String, completion: @escaping (TracksModel?) -> Void) {
