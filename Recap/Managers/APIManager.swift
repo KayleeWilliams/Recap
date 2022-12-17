@@ -25,6 +25,11 @@ class APIManager: ObservableObject {
     @Published var topGenresMedium: Array<(key: String, value: Int)>?
     @Published var topGenresLong: Array<(key: String, value: Int)>?
 
+    @Published var genreSeeds: GenreSeedModel?
+    @Published var songRec: RecModel?
+    
+    var userProfile: ProfileModel?
+
     
     let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
     
@@ -73,10 +78,80 @@ class APIManager: ObservableObject {
                 self.topGenresLong = self.getGenres(artists: result!)
             }
         }
+        
+        self.getGenreSeeds() { result in
+            DispatchQueue.main.async {
+                self.genreSeeds = result
+            }
+        }
+        
+        self.getProfile() { result in
+            DispatchQueue.main.async {
+                self.userProfile = result
+            }
+        }
+    }
+        
+    func addTracks(trackIDs: [Track], completion: @escaping (SnapshotModel?) -> Void)  {
+        createPlaylist() { playlist in
+            let id = playlist?.id
+            let url = URL(string: "https://api.spotify.com/v1/playlists/\(id!)/tracks")!
+            let uris = trackIDs.map{$0.uri!}
+            let body: [String: Any] = ["uris": uris]
+            self.post(url: url, body: body) { json in
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode(SnapshotModel.self, from: json)
+                completion(result)
+            }
+        }
     }
     
+    private func createPlaylist(completion: @escaping (PlaylistModel?) -> Void) {
+        let url = URL(string: "https://api.spotify.com/v1/users/\(self.userProfile!.id!)/playlists")!
+        let body: [String: Any] = ["name": "Your Recap", "description": "Tailored tunes for your unique taste.", "public": false]
+        self.post(url: url, body: body) { json in
+            let decoder = JSONDecoder()
+            let result = try? decoder.decode(PlaylistModel.self, from: json)
+            completion(result)
+        }
+    }
     
-    func getGenres(artists: ArtistsModel) -> Array<(key: String, value: Int)> {
+    private func getProfile(completion: @escaping (ProfileModel?) -> Void) {
+        let url = URL(string: "https://api.spotify.com/v1/me")!
+        fetch(url: url) { (json) in
+            let decoder = JSONDecoder()
+            let result = try? decoder.decode(ProfileModel.self, from: json)
+            completion(result)
+        }
+    }
+    
+    func getRecByGenre(selection: [String], completion: @escaping (RecModel?) -> Void) {
+        let limit = 50
+        let seedGenres = selection.joined(separator: ",")
+//        let seedArtists = (topArtistsMedium?.items!.prefix(5).map{$0.id!})!.joined(separator: ",")
+//        let seedTracks = (topTracksMedium?.items!.prefix(5).map{$0.id!})!.joined(separator: ",")
+
+        let url = URL(string: "https://api.spotify.com/v1/recommendations?limit=\(limit)&seed_genres=\(seedGenres)")!
+        fetch(url: url) { (json) in
+            let decoder = JSONDecoder()
+            let result = try? decoder.decode(RecModel.self, from: json)
+            DispatchQueue.main.async {
+                self.songRec = result
+            }
+            completion(result)
+        }
+    }
+    
+    private func getGenreSeeds(completion: @escaping (GenreSeedModel?) -> Void) {
+        let url = URL(string: "https://api.spotify.com/v1/recommendations/available-genre-seeds")!
+        fetch(url: url) { (json) in
+            let decoder = JSONDecoder()
+            let result = try? decoder.decode(GenreSeedModel.self, from: json)
+            completion(result)
+        }
+    }
+    
+    private func getGenres(artists: ArtistsModel) -> Array<(key: String, value: Int)> {
         var genreCounts: [String: Int] = [:]
         for artist in artists.items! {
             for genre in artist.genres! {
@@ -91,7 +166,7 @@ class APIManager: ObservableObject {
         return genreCounts.sorted{ $0.value > $1.value }
     }
     
-    func getAlbums(tracks: TracksModel) -> Array<(key: String, value: (Album, Int))> {
+    private func getAlbums(tracks: TracksModel) -> Array<(key: String, value: (Album, Int))> {
         let albumCountsById = tracks.items!.reduce(into: [String: (Album, Int)]()) { albums, item in
             if let album = item.album {
                 if album.albumType == "ALBUM" {
@@ -107,7 +182,7 @@ class APIManager: ObservableObject {
         return sortedAlbumIDCounts
     }
     
-    func getTopTracks(timeRange: String, completion: @escaping (TracksModel?) -> Void) {
+    private func getTopTracks(timeRange: String, completion: @escaping (TracksModel?) -> Void) {
         let type = "tracks"
         let limit = 50
         
@@ -119,7 +194,7 @@ class APIManager: ObservableObject {
         }
     }
     
-    func getTopArtists(timeRange: String, completion: @escaping (ArtistsModel?) -> Void) {
+    private func getTopArtists(timeRange: String, completion: @escaping (ArtistsModel?) -> Void) {
         let type = "artists"
         let limit = 50
         
@@ -131,12 +206,37 @@ class APIManager: ObservableObject {
         }
     }
     
-    func fetch(url: URL, completion: @escaping (Data) -> Void) {
+    private func fetch(url: URL, completion: @escaping (Data) -> Void) {
         let accessToken = getToken()
   
         // Create a URLRequest object with the URL
         var request = URLRequest(url: url)
         request.addValue("Bearer \(accessToken!)", forHTTPHeaderField: "Authorization")
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                print("Error: \(error)")
+                return
+            }
+            if let data = data {
+                completion(data)
+            }
+        }
+        
+        task.resume()
+    }
+    
+    private func post(url: URL, body: [String: Any], completion: @escaping (Data) -> Void) {
+        let accessToken = getToken()
+  
+        // Create a URLRequest object with the URL
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("Bearer \(accessToken!)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let error = error {

@@ -9,7 +9,12 @@ import Foundation
 import SwiftUI
 
 struct ResultsView: View {
+    @EnvironmentObject var apiManager: APIManager
+    @Binding var showResults: Bool
+    @State private var showAlert = false
+
     var resultStyle: String
+    
     
     var body: some View {
         ZStack {
@@ -17,21 +22,28 @@ struct ResultsView: View {
                 .ignoresSafeArea()
             
             VStack {
-                Text("\(resultStyle) Result")
+                Text("\(resultStyle) Results")
                     .font(.system(size: 20, weight: .bold))
                     .padding(.bottom, 8)
                     .foregroundColor(Color("PrimaryText"))
                 
                 ScrollView {
                     VStack {
-                        ForEach(0..<15) { _ in
-                            ResultView(resultStyle: resultStyle)
+                        if let tracks = apiManager.songRec?.tracks {
+                            ForEach(0..<tracks.count, id: \.self) { index in
+                                TrackResultView(track: tracks[index])
+                            }
                         }
                     }
                 }
                 
                 HStack(spacing: 12) {
-                    Button(action: {}, label: {
+                    
+                    Button(action: {
+                        apiManager.addTracks(trackIDs: (apiManager.songRec?.tracks)!) { result in
+                            showAlert = true
+                        }
+                    }, label: {
                         HStack(spacing: 6) {
                             Image(systemName: "plus")
                                 .resizable()
@@ -46,9 +58,13 @@ struct ResultsView: View {
                         .padding()
                         .background(Color("Button"))
                         .cornerRadius(10)
-                    })
+                    }).alert(Text("Playlist Created!"), isPresented: $showAlert) {
+                        Button("OK") { showAlert.toggle() }
+                    } message: {
+                        Text("Your new playlist has been added to your Spotify library.")
+                    }
                     
-                    Button(action: {}, label: {
+                    Button(action: {self.showResults = false}, label: {
                         HStack(spacing: 6) {
                             Image(systemName: "arrow.clockwise")
                                 .resizable()
@@ -73,22 +89,31 @@ struct ResultsView: View {
     }
 }
 
-struct ResultView: View {
-    var resultStyle: String
+struct TrackResultView: View {
+    var track: Track
     var body: some View {
         HStack() {
-            Image("Placeholder")
-                .resizable()
-                .frame(width: 48, height: 48)
-                .cornerRadius(resultStyle == "Artist" ? 100 : 12)
-                .padding(.leading, 12)
-            
+            AsyncImage(url: URL(string: (track.album?.images![0].url)!), content: { returnedImage in
+                if let returnedImage = returnedImage.image {
+                    returnedImage
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .cornerRadius(12)
+                        .padding(.leading, 12)
+                } else {
+                    Image("Placeholder")
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .cornerRadius(12)
+                        .padding(.leading, 12)
+                }
+            })
             VStack(alignment: .leading) {
-                Text("Title")
+                Text("\(track.name!)".prefix(20))
                     .foregroundColor(Color("PrimaryText"))
                     .font(.system(size: 20, weight: .bold))
                 
-                Text("Alt Text")
+                Text("\(track.artists![0].name!)".prefix(20))
                     .foregroundColor(Color("AltText"))
                     .font(.system(size: 20, weight: .medium))
             }
@@ -101,9 +126,4 @@ struct ResultView: View {
     }
 }
 
-struct ResultsView_Previews: PreviewProvider {
-    static var previews: some View {
-        ResultsView(resultStyle: "Artist")
-        
-    }
-}
+

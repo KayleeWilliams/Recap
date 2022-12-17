@@ -14,7 +14,10 @@ import SwiftUI
 //}
 
 struct SongFinderView: View {
-    @State private var multiSelection = Set<UUID>()
+    @EnvironmentObject var apiManager: APIManager
+    @State private var multiSelection: [String] = []
+    @State private var showResults = false
+
     let selectedBadge = Text("\(Image(systemName: "checkmark"))")
         .foregroundColor(Color("Button"))
     
@@ -23,44 +26,12 @@ struct SongFinderView: View {
             Color("Background")
                 .ignoresSafeArea()
             
-            VStack {
-                Text("Song Finder")
-                    .font(.system(size: 20, weight: .bold))
-                    .padding(.bottom, 8)
-                    .foregroundColor(Color("PrimaryText"))
-                
-                List (selection: $multiSelection) {
-                    ForEach(genreList) { genre in
-                        Text(genre.label)
-                            .badge(multiSelection.contains(genre.id) ? selectedBadge : nil )
-                            .foregroundColor(Color("PrimaryText"))
-                            .font(.system(size: 17, weight: .medium))
-                    }
-                    .listRowBackground(Color("AltBG"))
-                }
-                .scrollContentBackground(.hidden)
-
-                HStack(spacing: 12) {
-                    Button(action: {}, label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "plus")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 16)
-                                .foregroundColor(Color("ButtonText"))
-        
-                            Text("Playlist")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(Color("ButtonText"))
-                        }
-                        .padding()
-                        .background(Color("Button"))
-                        .cornerRadius(10)
-                    })
-                    
-                }
-                .padding(.bottom, 32)
-                .padding(.top, 6)
+            if showResults {
+                ResultsView(showResults: $showResults, resultStyle: "Song Finder")
+                    .environmentObject(apiManager)
+                    .onDisappear{showResults = false}
+            } else {
+                ListView(showResults: $showResults)
             }
         }
     }
@@ -73,19 +44,70 @@ struct SongFinderView_Previews: PreviewProvider {
     }
 }
 
+struct ListView: View {
+    @EnvironmentObject var apiManager: APIManager
+    @State private var multiSelection: [String] = []
+    @Binding var showResults: Bool
 
-var genreList = [
-    GenreData(label: "Rock", value: 100),
-    GenreData(label: "Pop", value: 90),
-    GenreData(label: "Hip Hop", value: 80),
-    GenreData(label: "R&B", value: 70),
-    GenreData(label: "Country", value: 60),
-    GenreData(label: "Jazz", value: 50),
-    GenreData(label: "Classical", value: 10),
-    GenreData(label: "Metal", value: 40),
-    GenreData(label: "Folk", value: 20),
-    GenreData(label: "Electronic", value: 30),
-
-]
-
-
+    let selectedBadge = Text("\(Image(systemName: "checkmark"))")
+        .foregroundColor(Color("Button"))
+    
+    var body: some View {
+        VStack {
+            Text("Song Finder")
+                .font(.system(size: 20, weight: .bold))
+                .padding(.bottom, 8)
+                .foregroundColor(Color("PrimaryText"))
+            
+            List() {
+                ForEach((apiManager.genreSeeds?.genres)!, id: \.self) { genre in
+                    Button(action: {
+                        if multiSelection.contains(genre) {
+                            multiSelection.removeAll(where: { $0 == genre })
+                        } else {
+                            multiSelection.append(genre)
+                            if multiSelection.count > 5 {
+                                multiSelection.removeFirst()
+                            }
+                        }
+                    }) {
+                        HStack {
+                            Text(genre)
+                                .badge(multiSelection.contains(genre) ? selectedBadge : nil )
+                                .foregroundColor(Color("PrimaryText"))
+                                .font(.system(size: 17, weight: .medium))
+                        }
+                    }
+                }
+                .listRowBackground(Color("AltBG"))
+            }
+            .scrollContentBackground(.hidden)
+        
+            HStack(spacing: 12) {
+                Button(action: {
+                    apiManager.getRecByGenre(selection: multiSelection) {
+                        result in
+                        showResults.toggle()
+                    }}, label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundColor(Color("ButtonText"))
+    
+                        Text("Playlist")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(Color("ButtonText"))
+                    }
+                    .padding()
+                    .background(Color("Button"))
+                    .cornerRadius(10)
+                })
+                
+            }
+            .padding(.bottom, 32)
+            .padding(.top, 6)
+        }
+    }
+}

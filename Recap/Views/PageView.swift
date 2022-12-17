@@ -38,14 +38,15 @@ struct PageView: View {
                         .foregroundColor(.white)
                 }
 
-            ResultsView(resultStyle: "Artist")
-                .tabItem {
-                    Image(systemName: "person.fill.viewfinder")
-                    Text("Artist Finder")
-                        .foregroundColor(.white)
-                }
+//            ResultsView(resultStyle: "Artist")
+//                .tabItem {
+//                    Image(systemName: "person.fill.viewfinder")
+//                    Text("Artist Finder")
+//                        .foregroundColor(.white)
+//                }
             
             SongFinderView()
+                .environmentObject(apiManager)
                 .tabItem {
                     Image(systemName: "waveform")
                     Text("Song Finder")
