@@ -27,8 +27,7 @@ class APIManager: ObservableObject {
 
     @Published var genreSeeds: GenreSeedModel?
     @Published var songRec: RecModel?
-    
-    var userProfile: ProfileModel?
+    @Published var userProfile: ProfileModel?
 
     
     let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
@@ -41,6 +40,12 @@ class APIManager: ObservableObject {
     
     func getData() {
         // Async as Publishing changes from background threads is not allowed; make sure to publish values from the main thread.
+        self.getProfile() { result in
+            DispatchQueue.main.async {
+                self.userProfile = result
+            }
+        }
+        
         self.getTopTracks(timeRange: "short_term") { (result) in
             DispatchQueue.main.async {
                 self.topTracksShort = result
@@ -84,12 +89,6 @@ class APIManager: ObservableObject {
                 self.genreSeeds = result
             }
         }
-        
-        self.getProfile() { result in
-            DispatchQueue.main.async {
-                self.userProfile = result
-            }
-        }
     }
         
     func addTracks(trackIDs: [Track], completion: @escaping (SnapshotModel?) -> Void)  {
@@ -128,10 +127,10 @@ class APIManager: ObservableObject {
     func getRecByGenre(selection: [String], completion: @escaping (RecModel?) -> Void) {
         let limit = 50
         let seedGenres = selection.joined(separator: ",")
+        let market = self.userProfile?.country
 //        let seedArtists = (topArtistsMedium?.items!.prefix(5).map{$0.id!})!.joined(separator: ",")
 //        let seedTracks = (topTracksMedium?.items!.prefix(5).map{$0.id!})!.joined(separator: ",")
-
-        let url = URL(string: "https://api.spotify.com/v1/recommendations?limit=\(limit)&seed_genres=\(seedGenres)")!
+        let url = URL(string: "https://api.spotify.com/v1/recommendations?limit=\(limit)&seed_genres=\(seedGenres)&market=\(market!)")!
         fetch(url: url) { (json) in
             let decoder = JSONDecoder()
             let result = try? decoder.decode(RecModel.self, from: json)

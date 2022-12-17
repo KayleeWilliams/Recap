@@ -17,7 +17,7 @@ class AuthManager: ObservableObject {
     let redirectUri = URL(string: "https://www.kayleewilliams.dev")!
     let authURL = URL(string: "https://accounts.spotify.com/authorize")!
     let tokenURL = URL(string: "https://accounts.spotify.com/api/token")!
-    var scope = "user-top-read playlist-modify-private"
+    var scope = "user-top-read playlist-modify-private user-read-private"
     let authorizationURL: URL
     
     // Generate a random string to use as the state parameter and the code verifier for PKCE
