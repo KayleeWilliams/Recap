@@ -28,10 +28,10 @@ class APIManager: ObservableObject {
     @Published var genreSeeds: GenreSeedModel?
     @Published var songRec: RecModel?
     @Published var userProfile: ProfileModel?
+    @Published var relatedArtists: [Artist]?
 
-    
     let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
-    
+
     func getToken() -> String? {
         let keychain = Keychain(service: "dev.kayleewilliams.recap.keychain")
         do { let accessToken = try keychain.get("accessToken"); return accessToken!
@@ -87,6 +87,53 @@ class APIManager: ObservableObject {
         self.getGenreSeeds() { result in
             DispatchQueue.main.async {
                 self.genreSeeds = result
+            }
+        }
+    }
+    
+    func playlistByArtist(artists: [Artist], completion: @escaping (Bool?) -> Void)  {
+        self.getArtistTracks(artists: artists) { tracks in
+            self.addTracks(trackIDs: tracks!) { _ in
+                completion(true)
+            }
+        }
+    }
+    
+    private func getArtistTracks(artists: [Artist], completion: @escaping ([Track]?) -> Void)  {
+        let market = self.userProfile?.country
+        var selectedTracks: [Track] = []
+        
+        DispatchQueue.main.async {
+            for artist in artists {
+                let url = URL(string: "https://api.spotify.com/v1/artists/\(artist.id!)/top-tracks?market=\(market!)")!
+                self.fetch(url: url) { (json) in
+                    let decoder = JSONDecoder()
+                    if let result = try? decoder.decode(TopTracksModel.self, from: json) {
+                        let shortResult = result.tracks?.shuffled().prefix(5) ?? []
+                        for item in shortResult {
+                            selectedTracks.append(item)
+                        }
+                    }
+                }
+            }
+            completion(selectedTracks)
+        }
+    }
+    
+    
+    func getRelatedArtists(ids: [String]) {
+        DispatchQueue.main.async { self.relatedArtists = [] }
+        for aid in ids {
+            let url = URL(string: "https://api.spotify.com/v1/artists/\(aid)/related-artists")!
+            self.fetch(url: url) { (json) in
+                let decoder = JSONDecoder()
+                if let result = try? decoder.decode(RelatedArtistsModel.self, from: json) {
+                    for artist in result.artists?.shuffled().prefix(10) ?? [] {
+                        DispatchQueue.main.async {
+                            self.relatedArtists!.append(artist)
+                        }
+                    }
+                }
             }
         }
     }

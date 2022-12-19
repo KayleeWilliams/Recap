@@ -8,10 +8,6 @@
 import Foundation
 import SwiftUI
 
-//struct Genre: Identifiable {
-//    let name: String
-//    let id = UUID()
-//}
 
 struct SongFinderView: View {
     @EnvironmentObject var apiManager: APIManager

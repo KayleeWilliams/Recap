@@ -52,3 +52,7 @@ struct ItemImage: Codable {
     let url: String?
     let width: Int?
 }
+
+struct RelatedArtistsModel: Codable {
+    let artists: [Artist]?
+}

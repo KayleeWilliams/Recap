@@ -33,6 +33,12 @@ struct ResultsView: View {
                             ForEach(0..<tracks.count, id: \.self) { index in
                                 TrackResultView(track: tracks[index])
                             }
+                        } else {
+                            if let artists = apiManager.relatedArtists {
+                                ForEach(0..<artists.count, id: \.self) { index in
+                                    ArtistResultView(artist: artists[index])
+                                }
+                            }
                         }
                     }
                 }
@@ -40,8 +46,16 @@ struct ResultsView: View {
                 HStack(spacing: 12) {
                     
                     Button(action: {
-                        apiManager.addTracks(trackIDs: (apiManager.songRec?.tracks)!) { result in
-                            showAlert = true
+                        if resultStyle == "Song Finder" {
+                            apiManager.addTracks(trackIDs: (apiManager.songRec?.tracks)!) { result in
+                                showAlert = true
+                                //                            }
+                            }
+                        } else {
+                            apiManager.playlistByArtist(artists: apiManager.relatedArtists!) { result in
+                                showAlert = true
+                            }
+    
                         }
                     }, label: {
                         HStack(spacing: 6) {
@@ -91,6 +105,7 @@ struct ResultsView: View {
 
 struct TrackResultView: View {
     var track: Track
+    
     var body: some View {
         HStack() {
             AsyncImage(url: URL(string: (track.album?.images![0].url)!), content: { returnedImage in
@@ -126,4 +141,40 @@ struct TrackResultView: View {
     }
 }
 
-
+struct ArtistResultView: View {
+    var artist: Artist
+    
+    var body: some View {
+        HStack() {
+            AsyncImage(url: URL(string: (artist.images![0].url)!), content: { returnedImage in
+                if let returnedImage = returnedImage.image {
+                    returnedImage
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .cornerRadius(100)
+                        .padding(.leading, 12)
+                } else {
+                    Image("Placeholder")
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .cornerRadius(100)
+                        .padding(.leading, 12)
+                }
+            })
+            VStack(alignment: .leading) {
+                Text("\(artist.name!)".prefix(20))
+                    .foregroundColor(Color("PrimaryText"))
+                    .font(.system(size: 20, weight: .bold))
+                
+                Text("\(artist.genres!.prefix(2).joined(separator: ", ").capitalized)".prefix(20))
+                    .foregroundColor(Color("AltText"))
+                    .font(.system(size: 20, weight: .medium))
+            }
+            .padding(.leading, 6)
+            
+        }
+        .frame(width: 300, height: 64, alignment: .leading)
+        .background(Color("AltBG"))
+        .cornerRadius(12)
+    }
+}

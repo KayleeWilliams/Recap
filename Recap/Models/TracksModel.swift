@@ -89,3 +89,8 @@ struct TrackArtist: Codable {
 struct ExternalIDS: Codable {
     let isrc: String?
 }
+
+
+struct TopTracksModel: Codable {
+    let tracks: [Track]?
+}
