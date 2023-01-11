@@ -146,21 +146,23 @@ struct ArtistResultView: View {
     
     var body: some View {
         HStack() {
-            AsyncImage(url: URL(string: (artist.images![0].url)!), content: { returnedImage in
-                if let returnedImage = returnedImage.image {
-                    returnedImage
-                        .resizable()
-                        .frame(width: 48, height: 48)
-                        .cornerRadius(100)
-                        .padding(.leading, 12)
-                } else {
-                    Image("Placeholder")
-                        .resizable()
-                        .frame(width: 48, height: 48)
-                        .cornerRadius(100)
-                        .padding(.leading, 12)
-                }
-            })
+            if let images = artist.images, let image = images.first {
+                AsyncImage(url: URL(string: (image.url)!), content: { returnedImage in
+                    if let returnedImage = returnedImage.image {
+                        returnedImage
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                            .cornerRadius(100)
+                            .padding(.leading, 12)
+                    } else {
+                        Image("Placeholder")
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                            .cornerRadius(100)
+                            .padding(.leading, 12)
+                    }
+                })
+            }
             VStack(alignment: .leading) {
                 Text("\(artist.name!)".prefix(20))
                     .foregroundColor(Color("PrimaryText"))

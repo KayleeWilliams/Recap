@@ -133,9 +133,9 @@ struct TrackView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            AsyncImage(url: URL(string: (track.album?.images![0].url)!), content: { returnedImage in
-                if let returnedImage = returnedImage.image {
-                    returnedImage
+            AsyncImage(url: URL(string: (track.album?.images![0].url)!), content: { phase in
+                if let image = phase.image {
+                    image
                         .resizable()
                         .frame(width: 160, height: 160)
                         .cornerRadius(8)
@@ -152,7 +152,9 @@ struct TrackView: View {
                     .font(.system(size: 14, weight: .medium))
                 Text("\(track.name!)".prefix(20))
                     .foregroundColor(Color("PrimaryText"))
+                    .fixedSize(horizontal: false, vertical: false)
                     .font(.system(size: 14, weight: .bold))
+                    .lineLimit(1)
             }
             Text("\(track.artists![0].name!)")
                 .foregroundColor(Color("AltText"))
@@ -167,9 +169,9 @@ struct ArtistView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            AsyncImage(url: URL(string: (artist.images![0].url)!), content: { returnedImage in
-                if let returnedImage = returnedImage.image {
-                    returnedImage
+            AsyncImage(url: URL(string: (artist.images![0].url)!), content: { phase in
+                if let image = phase.image {
+                    image
                         .resizable()
                         .frame(width: 160, height: 160)
                         .cornerRadius(8)
@@ -198,9 +200,9 @@ struct AlbumView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            AsyncImage(url: URL(string: (album.images![0].url)!), content: { returnedImage in
-                if let returnedImage = returnedImage.image {
-                    returnedImage
+            AsyncImage(url: URL(string: (album.images![0].url)!), content: { phase in
+                if let image = phase.image {
+                    image
                         .resizable()
                         .frame(width: 160, height: 160)
                         .cornerRadius(8)
@@ -218,6 +220,7 @@ struct AlbumView: View {
                 Text(album.name!.prefix(20))
                     .foregroundColor(Color("PrimaryText"))
                     .font(.system(size: 14, weight: .bold))
+                    .lineLimit(1)
             }
             Text(album.artists![0].name!)
                 .foregroundColor(Color("AltText"))

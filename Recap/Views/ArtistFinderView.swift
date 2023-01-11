@@ -36,6 +36,7 @@ struct ChoicesView: View {
     @EnvironmentObject var apiManager: APIManager
     @Binding var showResults: Bool
     @State var artists: [Artist] = []
+//    @State var shuffledArtists: [Artist] = []
     @State private var selectedArtists: [String] = []
     
     let selectedBadge = Text("\(Image(systemName: "checkmark"))")
@@ -51,13 +52,13 @@ struct ChoicesView: View {
                     .font(.system(size: 20, weight: .bold))
                     .padding(.bottom, 8)
                     .foregroundColor(Color("PrimaryText"))
-                
+                Spacer()
                 if !artists.isEmpty {
                     ForEach(artists.prefix(2).indices, id: \.self, content: { index in
                         VStack(alignment: .center) {
-                            AsyncImage(url: URL(string: (artists[index].images![0].url)!), content: { returnedImage in
-                                if let returnedImage = returnedImage.image {
-                                    returnedImage
+                            AsyncImage(url: URL(string: (artists[index].images![0].url)!), content: { phase in
+                                if let image = phase.image {
+                                    image
                                         .resizable()
                                         .frame(width: 240, height: 240)
                                         .cornerRadius(8)
@@ -72,18 +73,26 @@ struct ChoicesView: View {
                         }.onTapGesture {
                             selectedArtists.append(artists[index].id!)
                             artists.remove(at: index)
-                            if ((artists.count == 0) || selectedArtists.count == 5) {
+                            if ((selectedArtists.count == 0) || selectedArtists.count == 5) {
                                 DispatchQueue.main.async {
                                     apiManager.getRelatedArtists(ids: selectedArtists)
                                     showResults = true
                                 }
                             }
                         }
+                        if index == 0 {
+                            Spacer()
+                            Text("OR")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(Color("PrimaryText"))
+                            Spacer()
+                        }
                     }).onDelete { indices in
                         indices.forEach { artists.remove(at: $0) }
                     }
                 }
-            }.onAppear{self.artists = (self.apiManager.topArtistsMedium?.items)!}
+                Spacer()
+            }.onAppear{self.artists = (self.apiManager.topArtistsMedium?.items)!.prefix(15).shuffled()}
         }
     }
 }

@@ -45,9 +45,9 @@ struct ArtistPopularity: View {
     let artist: Artist
     var body: some View {
         HStack(spacing: 18) {
-            AsyncImage(url: URL(string: (artist.images![0].url)!), content: { returnedImage in
-                if let returnedImage = returnedImage.image {
-                    returnedImage
+            AsyncImage(url: URL(string: (artist.images![0].url)!), content: { phase in
+                if let image = phase.image {
+                    image
                         .resizable()
                         .frame(width: 48, height: 48)
                         .cornerRadius(100)
