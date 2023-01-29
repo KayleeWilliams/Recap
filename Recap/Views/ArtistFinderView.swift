@@ -38,7 +38,7 @@ struct ChoicesView: View {
     @State var artists: [Artist] = []
 //    @State var shuffledArtists: [Artist] = []
     @State private var selectedArtists: [String] = []
-    
+
     let selectedBadge = Text("\(Image(systemName: "checkmark"))")
         .foregroundColor(Color("Button"))
     
@@ -60,7 +60,7 @@ struct ChoicesView: View {
                                 if let image = phase.image {
                                     image
                                         .resizable()
-                                        .frame(width: 240, height: 240)
+                                        .frame(width: 200, height: 200)
                                         .cornerRadius(8)
                                 } else {
                                     Image("Placeholder")

@@ -12,21 +12,6 @@ import SwiftUI
 import UIKit
 import KeychainAccess
 
-
-//struct WebView: UIViewRepresentable {
-//
-//    var url: URL
-//
-//    func makeUIView(context: Context) -> WKWebView {
-//        return WKWebView()
-//    }
-//
-//    func updateUIView(_ webView: WKWebView, context: Context) {
-//        let request = URLRequest(url: url)
-//        webView.load(request)
-//    }
-//}
-
 struct WebView: UIViewRepresentable {
     @EnvironmentObject var authentication: AuthManager
 

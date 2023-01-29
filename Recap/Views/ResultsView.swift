@@ -29,11 +29,14 @@ struct ResultsView: View {
                 
                 ScrollView {
                     VStack {
-                        if let tracks = apiManager.songRec?.tracks {
-                            ForEach(0..<tracks.count, id: \.self) { index in
-                                TrackResultView(track: tracks[index])
+                        if resultStyle == "Song Finder" {
+                            if let tracks = apiManager.songRec?.tracks {
+                                ForEach(0..<tracks.count, id: \.self) { index in
+                                    TrackResultView(track: tracks[index])
+                                }
                             }
-                        } else {
+                        }
+                        if resultStyle == "Artist Finder" {
                             if let artists = apiManager.relatedArtists {
                                 ForEach(0..<artists.count, id: \.self) { index in
                                     ArtistResultView(artist: artists[index])
